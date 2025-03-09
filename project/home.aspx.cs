@@ -51,13 +51,19 @@ public partial class project_home : System.Web.UI.Page
 
     protected void ImageButton1_Click(object sender, ImageClickEventArgs e)
     {
-         if (Session["username"] == null)
+        if (Session["username"] == null)
         {
             Response.Redirect("login.aspx");
         }
         else
         {
-            Response.Redirect("addtocart.aspx");
+            // Get the product ID from the command argument
+            ImageButton btn = (ImageButton)sender;
+            string productId = btn.CommandArgument;
+            
+            // Just redirect with the product ID
+            // We'll use a default quantity of 1 for simplicity
+            Response.Redirect("addtocart.aspx?id=" + productId);
         }
     }
 }

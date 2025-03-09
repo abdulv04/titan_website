@@ -6,10 +6,10 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
     <div align="center" style="margin:0 auto;">
         <h2 style="text-decoration:underline overline; color:#5f98f3">You Have Following Product In Your Cart</h2>
-        <asp:HyperLink ID="HyperLink1" runat="server" Font-Bold="True" Font-Names="Colonna MT" Font-Size="X-Large" NavigateUrl="~/project/home.aspx">Continue Shoppng </asp:HyperLink>
+        <asp:HyperLink ID="HyperLink1" runat="server" Font-Bold="True" Font-Names="Colonna MT" Font-Size="X-Large" NavigateUrl="~/project/home.aspx">Continue Shopping </asp:HyperLink>
         <br /><br />
 
-        <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="False" BackColor="#5F98F3" BorderColor="#333333" BorderWidth="5px" EmptyDataText="No Product Available In Shopping Cart" Font-Bold="True" Height="257px" ShowFooter="True" Width="1100px">
+        <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="False" BackColor="#5F98F3" BorderColor="#333333" BorderWidth="5px" EmptyDataText="No Product Available In Shopping Cart" Font-Bold="True" Height="257px" ShowFooter="True" Width="1100px" OnRowDeleting="GridView1_RowDeleting">
             <Columns>
                 <asp:BoundField DataField="sno" HeaderText="Sr No">
                 <ItemStyle HorizontalAlign="Center" />
