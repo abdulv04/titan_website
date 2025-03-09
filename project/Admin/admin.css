@@ -1,0 +1,13 @@
+﻿.navbar {
+ 
+    background:#00c3ff;
+    background:-webkit-linear-gradient(to right,#ffff1c,#00c3ff);
+    background: linear-gradient(to right,#ffff1c,#00c3ff);
+
+}
+.button {
+    background:#0052D4;
+    background:-webkit-linear-gradient(to right,#6Fb1FC,#4363F7,#0052D4);
+    background: linear-gradient(to right,#6FB1FC,#4364F7,#0052D4);
+
+}
