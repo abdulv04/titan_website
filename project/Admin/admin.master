@@ -1,0 +1,60 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="admin.master.cs" Inherits="project_Admin_admin" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+    <asp:ContentPlaceHolder id="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <div>
+        <table align="center">
+            <tr style="width:1200px; color:aqua; height:160px">
+                <td>
+                    <asp:Image ID="Image1" runat="server" BorderColor="#666666" BorderWidth="3px" Height="230px" Width="1221px" ImageUrl="~/images/background2.jpg"/>
+                </td>
+            </tr>
+            <tr style="border-width:8px; border-color:#666666; width:1200px; color:#666666; height:60px; background-color:#c547ff">
+                <td>
+                    <div class="navbar">
+                        <table align="center" cellpadding="10">
+                            <tr style="border-color:#666666;">
+                                <td>
+                                    <asp:Button ID="Button1" runat="server" Text="Add Catagory" Height="49px" BackColor="#666666" 
+                                        CausesValidation="False" Font-Bold="True" Font-Size="Medium" Width="171px"/>
+                                </td>
+                                <td>
+                                    <asp:Button ID="Button2" runat="server" Text="Add Product" Height="49px" BackColor="#666666" 
+                                        CausesValidation="False" Font-Bold="True" Font-Size="Medium" Width="171px"/>
+                                </td>
+                                <td>
+                                    <asp:Button ID="Button3" runat="server" Text="Product Detail" Height="49px" BackColor="#666666" 
+                                        CausesValidation="False" Font-Bold="True" Font-Size="Medium" Width="171px"/>
+                                </td>
+                                <td>
+                                    <asp:Button ID="Button4" runat="server" Text="Add Catagory" Height="49px" BackColor="#666666" 
+                                        CausesValidation="False" Font-Bold="True" Font-Size="Medium" Width="171px"/>
+                                </td>
+                                <td>
+                                    <asp:Button ID="Button5" runat="server" Text="LogOut" Height="49px" BackColor="#666666" 
+                                        CausesValidation="False" Font-Bold="True" Font-Size="Medium" Width="171px"/>
+                                </td>
+                            </tr>
+
+                        </table>
+
+                    </div>
+
+                </td>
+            </tr>
+        </table>
+        <asp:ContentPlaceHolder id="ContentPlaceHolder1" runat="server">
+        
+        </asp:ContentPlaceHolder>
+    </div>
+    </form>
+</body>
+</html>
