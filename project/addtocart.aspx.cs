@@ -24,6 +24,7 @@ public partial class project_addtocart : System.Web.UI.Page
                 dt.Columns.Add("pprice");
                 dt.Columns.Add("pquantity");
                 dt.Columns.Add("ptotalprice");
+                dt.Columns.Add("orderdate");
                 
                 Session["buyitems"] = dt;
             }
@@ -62,6 +63,7 @@ public partial class project_addtocart : System.Web.UI.Page
         dr["pimage"] = ds.Tables[0].Rows[0]["Pimage"].ToString();
         dr["pprice"] = ds.Tables[0].Rows[0]["Pprice"].ToString();
         dr["pquantity"] = quantity;
+        dr["orderdate"] = Session["Orderdate"].ToString();
 
         int price = Convert.ToInt32(ds.Tables[0].Rows[0]["Pprice"].ToString());
         int totalPrice = price * quantity;
@@ -79,43 +81,19 @@ public partial class project_addtocart : System.Web.UI.Page
 
     protected void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
     {
-        try
+        DataTable dt = (DataTable)Session["buyitems"];
+        int rowIndex = e.RowIndex;
+        dt.Rows[rowIndex].Delete();
+        dt.AcceptChanges();
+
+        // Reassign serial numbers
+        for (int i = 0; i < dt.Rows.Count; i++)
         {
-            DataTable dt = (DataTable)Session["buyitems"];
-            if (dt != null && dt.Rows.Count > e.RowIndex)
-            {
-                dt.Rows.RemoveAt(e.RowIndex);
-                
-                // Reassign serial numbers
-                for (int i = 0; i < dt.Rows.Count; i++)
-                {
-                    dt.Rows[i]["sno"] = i + 1;
-                }
-                
-                Session["buyitems"] = dt;
-                
-                // Rebind the GridView
-                GridView1.DataSource = dt;
-                GridView1.DataBind();
-                
-                // Update footer if there are items
-                if (dt.Rows.Count > 0)
-                {
-                    GridView1.FooterRow.Cells[5].Text = "Total Amount";
-                    GridView1.FooterRow.Cells[6].Text = grandtotal().ToString();
-                    Button1.Enabled = true;
-                }
-                else
-                {
-                    Button1.Enabled = false;
-                }
-            }
+            dt.Rows[i]["sno"] = i + 1;
         }
-        catch (Exception ex)
-        {
-            // Log or display the error
-            Response.Write("<script>alert('Error deleting item: " + ex.Message + "');</script>");
-        }
+
+        Session["buyitems"] = dt;
+        Response.Redirect("addtocart.aspx");
     }
 
     //2.Calculating Final Price
@@ -150,32 +128,52 @@ public partial class project_addtocart : System.Web.UI.Page
 
     protected void Button1_Click(object sender, EventArgs e)
     {
-        DataTable dt;
-        dt = (DataTable)Session["buyitems"];
-        for (int i = 0; i <= dt.Rows.Count - 1; i++)
+        // Generate order ID if it doesn't exist
+        if (Session["orderid"] == null)
+        {
+            Random rnd = new Random();
+            Session["orderid"] = "ORD" + rnd.Next(100000, 999999).ToString();
+        }
+        
+        // Set order date
+        string orderDate = DateTime.Now.ToShortDateString();
+        Session["Orderdate"] = orderDate;
+        
+        // Get cart items
+        DataTable dt = (DataTable)Session["buyitems"];
+        
+        // Save order details to database
+        if (dt != null && dt.Rows.Count > 0)
         {
             SqlConnection scon = new SqlConnection(@"Data Source=(LocalDB)\v11.0;AttachDbFilename=D:\Titan watch(3004)\App_Data\Database1.mdf;Integrated Security=True");
             scon.Open();
-            SqlCommand cmd = new SqlCommand("insert into orderdetails(orderid,sno,pid,pname,pprice,pquantity,orderdate)values('" + Session["orderid"] + "','" + dt.Rows[i]["sno"] + "','" + dt.Rows[i]["pid"] + "','" + dt.Rows[i]["pname"] + "','" + dt.Rows[i]["pprice"] + "','" + dt.Rows[i]["pquantity"] + "','" + dt.Rows[i]["orderdate"] + "')");
-            cmd.ExecuteNonQuery();
+            
+            // First, clear any existing order details for this order ID
+            SqlCommand clearCmd = new SqlCommand("DELETE FROM orderdetails WHERE orderid=@orderid", scon);
+            clearCmd.Parameters.AddWithValue("@orderid", Session["orderid"]);
+            clearCmd.ExecuteNonQuery();
+            
+            // Now insert the new order details
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                SqlCommand cmd = new SqlCommand("INSERT INTO orderdetails (orderid, sno, pid, pname, pprice, pquantity, orderdate) VALUES (@orderid, @sno, @pid, @pname, @pprice, @pquantity, @orderdate)", scon);
+                
+                cmd.Parameters.AddWithValue("@orderid", Session["orderid"]);
+                cmd.Parameters.AddWithValue("@sno", dt.Rows[i]["sno"]);
+                cmd.Parameters.AddWithValue("@pid", dt.Rows[i]["pid"]);
+                cmd.Parameters.AddWithValue("@pname", dt.Rows[i]["pname"]);
+                cmd.Parameters.AddWithValue("@pprice", dt.Rows[i]["pprice"]);
+                cmd.Parameters.AddWithValue("@pquantity", dt.Rows[i]["pquantity"]);
+                cmd.Parameters.AddWithValue("@orderdate", orderDate);
+                
+                cmd.ExecuteNonQuery();
+            }
+            
             scon.Close();
         }
-        //IF Session is Null Redirect to login else placing the order
-        if (Session["username"] == null)
-        {
-            Response.Redirect("login.aspx");
-        }
-        else
-        {
-            if (GridView1.Rows.Count.ToString() == "0")
-            {
-                Response.Write("<script>alert('your Cart is Empty.You cannot place an order');</script>");
-            }
-            else
-            {
-                Response.Redirect("PlaceOrder.aspx");
-            }
-        }
+        
+        // Redirect to place order page
+        Response.Redirect("PlaceOrder.aspx");
     }
 
     private void DisplayCartItems()
